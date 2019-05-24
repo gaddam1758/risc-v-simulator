@@ -90,9 +90,10 @@ public class NewJFrame extends javax.swing.JFrame {
 
     //pagination of memory table based on address
     void setMemoryTable(int address) {
-        address = address - 10;
-        for (int i = 0; i < jTable2.getRowCount(); i++) {
-            if (address > 0 && address < 0x7FFFFFF0) {
+        current_address=address;
+        address = address - 40;
+        for (int i = jTable2.getRowCount()-1; i >=0 ; i--) {
+            if (address >=0 && address < 0x7FFFFFF0) {
                 jTable2.setValueAt(String.format("0x%08X", address), i, 0);
                 for (int j = 0; j < 4; j++) {
                     String temp = primary_memory.mem.getOrDefault(address, "0");
@@ -306,9 +307,19 @@ public class NewJFrame extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel7.setText("JUMP TO");
 
-        jTextField11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField11ActionPerformed(evt);
+        jTextField11.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextField11FocusLost(evt);
+            }
+        });
+        jTextField11.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jTextField11PropertyChange(evt);
+            }
+        });
+        jTextField11.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextField11KeyPressed(evt);
             }
         });
 
@@ -324,7 +335,13 @@ public class NewJFrame extends javax.swing.JFrame {
         jLabel8.setText("ADDRESS");
 
         jComboBox1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "__Choose__", "Text", "Data", "Heap", "Stack" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Text", "Data", "Heap", "Stack" }));
+        jComboBox1.setToolTipText("");
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("DOWN");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -676,6 +693,13 @@ public class NewJFrame extends javax.swing.JFrame {
     private void BuildActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuildActionPerformed
         // TODO add your handling code here:
         SaveActionPerformed(evt);
+        int a1 = Integer.parseInt(jTextField1.getText());
+        int a2 = Integer.parseInt(jTextField2.getText());
+        int a3 = Integer.parseInt(jTextField3.getText());
+        int a4 = Integer.parseInt(jTextField4.getText());
+        int a5 = Integer.parseInt(jTextField5.getText());
+
+        memory.set_primary_memory(a1, a2, a3, a4, a5);
         assembler obj = new assembler();
         try {
             obj.assemble(filename, memory);
@@ -712,13 +736,6 @@ public class NewJFrame extends javax.swing.JFrame {
     private void RunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RunActionPerformed
         // TODO add your handling code here:
         //String a=jTextField1.toString();
-        int a1 = Integer.parseInt(jTextField1.getText());
-        int a2 = Integer.parseInt(jTextField2.getText());
-        int a3 = Integer.parseInt(jTextField3.getText());
-        int a4 = Integer.parseInt(jTextField4.getText());
-        int a5 = Integer.parseInt(jTextField5.getText());
-
-        memory.set_primary_memory(a1, a2, a3, a4, a5);
         BuildActionPerformed(evt);
         File file = new File(outputfile);
 
@@ -777,25 +794,58 @@ public class NewJFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField8ActionPerformed
 
-    private void jTextField11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField11ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField11ActionPerformed
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        current_address += 5;
-        if (current_address < 0x7FFFFFF0)
+        current_address += 20;
+        if (current_address <= 0x7FFFFFF0&&current_address>0)
             setMemoryTable(current_address);
         else
-            current_address -= 5;
+            current_address -= 20;
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        current_address -= 5;
-        if (current_address > 0x00000000)
+        current_address -= 20;
+        if (current_address >= 0x00000000)
             setMemoryTable(current_address);
         else
-            current_address += 5;        // TODO add your handling code here:
+            current_address += 20;        // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        int temp=jComboBox1.getSelectedIndex(); 
+        if(temp==0)
+            setMemoryTable(0);
+        if(temp==1)
+             setMemoryTable(0x10000000);
+        if(temp==2)
+            setMemoryTable(0x10007FE8);
+        else if(temp==3)
+            setMemoryTable(0x7FFFFFF0);
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jTextField11FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField11FocusLost
+        // TODO add your handling code here:
+        String a=jTextField11.getText();
+       if(a.isEmpty())
+           return;
+       try
+       {
+         int b=Integer.parseInt(a,16);
+         setMemoryTable(b);
+       }
+       catch(NumberFormatException e)
+       {
+           return;
+       }
+       jTextField11.setText(null);
+    }//GEN-LAST:event_jTextField11FocusLost
+
+    private void jTextField11KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField11KeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField11KeyPressed
+
+    private void jTextField11PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTextField11PropertyChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField11PropertyChange
 
     /**
      * @param args the command line arguments
