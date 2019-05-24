@@ -96,7 +96,7 @@ public class NewJFrame extends javax.swing.JFrame {
             if (address >=0 && address < 0x7FFFFFF0) {
                 jTable2.setValueAt(String.format("0x%08X", address), i, 0);
                 for (int j = 0; j < 4; j++) {
-                    String temp = primary_memory.mem.getOrDefault(address, "0");
+                    String temp = primary_memory.mem.getOrDefault(address+j, "0");
                     int temp1 = Integer.parseInt(temp, 2);
                     jTable2.setValueAt(temp1, i, j + 1);
 
