@@ -10,7 +10,7 @@ public class primary_memory {
     int stack_start = 0x7FFFFFF0;//2^28-3-1
     final int heap_start = 0x10007FE8;//2^28
     final int instruction_start = 0;//no reserved,obvio !!
-    public int data_start = 1000;
+    public int data_start = 0x10000000;
     public int[] register;
     public String ir, irt;
     public int ra, rb, rm, rx, ry, rz, pc, iv;
@@ -81,7 +81,7 @@ public class primary_memory {
         /*memory=new String[268435]; //max-memory=2^28;
         for(int i=0;i< 268435;i++) memory[i]="00000000";*/
         //register = new int[32];
-        mem = new HashMap<>();
+        mem = new HashMap<>(); 
         this.c_size = c_size;
         this.b_size = b_size;
         this.c_type = c_type1;
