@@ -136,7 +136,7 @@ public class alu {
 		case 3: // lw
 
 			output = rs1i + immi;
-			//System.out.println(rs1i + ":" + immi);
+			System.out.println(rs1i + ":" + immi);
 			break;
 
 		case 5: // lbu
@@ -304,7 +304,9 @@ public class alu {
 
 		case 19: // auipc
 
-			output = rs1u + immu;
+			immu = immu<<12;
+			System.out.println(rs1u+"-"+immu);
+			output = rs1u + immu - 4;
 			break;
 
 		case 38: // lui

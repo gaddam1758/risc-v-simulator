@@ -359,7 +359,15 @@ public class datapath
 			break;
 
 		case 5:
-			alu.executeu(obj.id, ra, mem.iv); // U-type
+			System.out.println(mem.pc+"pc");
+			if(!pipelined)
+			{
+				alu.executeu(obj.id, mem.pc, mem.iv);// U-type
+			}
+			else
+			{
+				alu.executeu(obj.id, mem.pc-8, mem.iv);
+			}
 			mem.rxt = alu.output;
 			break;
 

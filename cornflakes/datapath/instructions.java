@@ -191,8 +191,10 @@ public class instructions
                     {
                         id = 19;type=5;
                         mem_switch=1;
-                        imms = array.substring(0, 21);
+                        imms = array.substring(0, 20);
                         iv = parseint(imms, 2);
+                        System.out.println(array+"num"+iv);
+                        return;
                     }
 
                 case "0011011":type=2;mem_switch=1;
