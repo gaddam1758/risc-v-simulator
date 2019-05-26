@@ -101,7 +101,8 @@ public class assembler {
             	}
             	else
             	{
-            		data_address = (data_address/4 + 1)*4;
+            		data_address = data_address>>2;
+                        data_address=data_address<<2;
             		System.out.println(data_address+"ro");
             		memory.storeword(data_address, Integer.parseInt(tokenlist.Tokens.get(i)));
             		data_address += 4;
@@ -120,7 +121,7 @@ public class assembler {
         }
        if(".asciiz".equals(tokenlist.Tokens.get(1)))
        {
-    	   data_map.put(label, new Integer(data_address));
+    	   data_map.put(label, data_address);
            String temp=tokenlist.Tokens.get(2);
     	   for (int i = 3; i < tokenlist.Tokens.size(); i++) {
               temp=temp+' '+tokenlist.Tokens.get(i);

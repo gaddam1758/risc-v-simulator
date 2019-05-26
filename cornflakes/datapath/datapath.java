@@ -625,34 +625,33 @@ public class datapath
 	}
 
 
-	public  void run(primary_memory mem,boolean pip)
+	public  void run(primary_memory mem,boolean pip,
+		boolean data_forwarding,
+		boolean disable_writing_to_registers,
+		boolean disable_writing_to_pipelined_regs,
+		boolean watch_pipline_reg,
+		boolean stall_decode)
 	{
-		Scanner s= new Scanner(System.in);
-		int step=s.nextInt();//continuos or not
-		boolean cont=false;
-		if(step>=0)
-			cont=true;
-
 		cur_pc=0;
 		mem.pc=0;
 		boolean flag;
 		instructions[] instr_que=new instructions[5];
 		for(instructions i:instr_que)i=null;
 		pipelined=pip;
+                this.data_forwarding=data_forwarding;
+                this.disable_writing_to_registers=disable_writing_to_registers;
+                this.disable_writing_to_pipelined_regs=disable_writing_to_pipelined_regs;
+                this.watch_pipline_reg=watch_pipline_reg;
+                this.stall_decode=stall_decode;
 		//int n=30;
 		while(true)
 		{
 			//n--;
-			if(!cont)
-			{
-				step=s.nextInt();
-				if(step<0) cont=!cont;
-			}
+			
 			print_reg(mem);
  		 prev_pc=cur_pc;
 		 flag=fetch (mem,instr_que);
 		 write  (mem,instr_que);
-		 if(no_of_instructions==step)
 		 print_reg(mem);
 		 decode (mem,instr_que);
 		 execute(mem,instr_que);

@@ -10,6 +10,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 public class Cache {
 
     int cache_size;
@@ -182,7 +183,6 @@ public class Cache {
         }
     }
 
-  
     public void storewordstr(int addr, String word_in) {
         calculate_addr(addr);
         access++;
@@ -200,12 +200,12 @@ public class Cache {
                         conflict_miss++;
                     }
                     int n = binlog(block_size * 4);//calculating start of block
-                    int bloc_addr = addr>>n;//
-                    int addr1=bloc_addr<<n;
+                    int bloc_addr = addr >> n;//
+                    int addr1 = bloc_addr << n;
                     for (int i = 0; i < block_size * 4; i++) {
                         calculate_addr(addr1 + i);
                         cache_dm[index].bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
-                        
+
                         cache_dm[index].tag = tag;
                         cache_dm[index].valid = true;
                     }
@@ -227,12 +227,12 @@ public class Cache {
                     }
                     temp = new block();
                     int n = binlog(block_size * 4);
-                    int bloc_addr = addr>>n;//calcualting starting addr of block
-                    int addr1=bloc_addr<<n; //
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
                     //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                         calculate_addr(addr1 + i);
-                        temp.bytes[i] = mem.getOrDefault(addr1+ i, "00000000");
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -256,12 +256,12 @@ public class Cache {
                     }
                     temp = new block();
                     int n = binlog(block_size * 4);//calculating start of block
-                    int bloc_addr = addr>>n;//
-                    int addr1=bloc_addr<<n;
+                    int bloc_addr = addr >> n;//
+                    int addr1 = bloc_addr << n;
                     for (int i = 0; i < block_size * 4; i++) {
                         calculate_addr(addr1 + i);
                         temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
-                        
+
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -276,7 +276,6 @@ public class Cache {
         }
     }
 
-  
     public String loadwordstr(int addr) {
 
         calculate_addr(addr);
@@ -293,12 +292,12 @@ public class Cache {
                         conflict_miss++;
                     }
                     int n = binlog(block_size * 4);
-                    int bloc_addr = addr>>n;//calcualting starting addr of block
-                    int addr1=bloc_addr<<n; //
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
                     //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                         calculate_addr(addr1 + i);
-                        cache_dm[index].bytes[i] = mem.getOrDefault(addr1+ i, "00000000");
+                        calculate_addr(addr1 + i);
+                        cache_dm[index].bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         cache_dm[index].tag = tag;
                         cache_dm[index].valid = true;
                     }
@@ -320,12 +319,12 @@ public class Cache {
                     }
                     temp = new block();
                     int n = binlog(block_size * 4);
-                    int bloc_addr = addr>>n;//calcualting starting addr of block
-                    int addr1=bloc_addr<<n; //
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
                     //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                         calculate_addr(addr1 + i);
-                        temp.bytes[i] = mem.getOrDefault(addr1+ i, "00000000");
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -353,13 +352,14 @@ public class Cache {
                         calculate_addr(addr + i);
                         temp.tag = tag;
                         temp.valid = true;
-                    }int n = binlog(block_size * 4);
-                    int bloc_addr = addr>>n;//calcualting starting addr of block
-                    int addr1=bloc_addr<<n; //
+                    }
+                    int n = binlog(block_size * 4);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
                     //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                         calculate_addr(addr1 + i);
-                        cache_dm[index].bytes[i] = mem.getOrDefault(addr1+ i, "00000000");
+                        calculate_addr(addr1 + i);
+                        cache_dm[index].bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         cache_dm[index].tag = tag;
                         cache_dm[index].valid = true;
                     }
@@ -377,7 +377,8 @@ public class Cache {
         String a = mem.get(addr + 3) + mem.get(addr + 2) + mem.get(addr + 1) + mem.get(addr);
         return a;
     }
-  public void storebytestr(int addr, String byte_in) {
+
+    public void storebytestr(int addr, String byte_in) {
         calculate_addr(addr);
         access++;
         //mem.put(addr, byte_in.substring(0, 8));
@@ -392,11 +393,12 @@ public class Cache {
                         conflict_miss++;
                     }
                     int n = binlog(block_size * 4);
-                    int bloc_addr = addr << (32 - n);
-                    bloc_addr = addr >> (32 - n);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
+                    //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                        cache_dm[index].bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        cache_dm[index].bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         cache_dm[index].tag = tag;
                         cache_dm[index].valid = true;
                     }
@@ -414,9 +416,13 @@ public class Cache {
                         capacity_miss++;
                     }
                     temp = new block();
+                    int n = binlog(block_size * 4);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
+                    //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                        temp.bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -436,10 +442,14 @@ public class Cache {
                     } else {
                         conflict_miss++;
                     }
-                    temp = new block();
+                   temp = new block();
+                    int n = binlog(block_size * 4);//calculating start of block
+                    int bloc_addr = addr >> n;//
+                    int addr1 = bloc_addr << n;
                     for (int i = 0; i < block_size * 4; i++) {
-                        temp.bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
+
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -452,7 +462,8 @@ public class Cache {
                 break;
         }
     }
-      public void storehalfstr(int addr, String half_in) {
+
+    public void storehalfstr(int addr, String half_in) {
         calculate_addr(addr);
         access++;
         switch (cache_type) {
@@ -467,11 +478,12 @@ public class Cache {
                         conflict_miss++;
                     }
                     int n = binlog(block_size * 4);
-                    int bloc_addr = addr << (32 - n);
-                    bloc_addr = addr >> (32 - n);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
+                    //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                        cache_dm[index].bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        cache_dm[index].bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         cache_dm[index].tag = tag;
                         cache_dm[index].valid = true;
                     }
@@ -491,9 +503,13 @@ public class Cache {
                         capacity_miss++;
                     }
                     temp = new block();
+                    int n = binlog(block_size * 4);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
+                    //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                        temp.bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -514,10 +530,14 @@ public class Cache {
                     } else {
                         conflict_miss++;
                     }
-                    temp = new block();
+                     temp = new block();
+                    int n = binlog(block_size * 4);//calculating start of block
+                    int bloc_addr = addr >> n;//
+                    int addr1 = bloc_addr << n;
                     for (int i = 0; i < block_size * 4; i++) {
-                        temp.bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
+
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -546,11 +566,12 @@ public class Cache {
                         conflict_miss++;
                     }
                     int n = binlog(block_size * 4);
-                    int bloc_addr = addr << (32 - n);
-                    bloc_addr = addr >> (32 - n);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
+                    //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                        cache_dm[index].bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        cache_dm[index].bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         cache_dm[index].tag = tag;
                         cache_dm[index].valid = true;
                     }
@@ -571,9 +592,13 @@ public class Cache {
                     }
 
                     temp = new block();
+                    int n = binlog(block_size * 4);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
+                    //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                        temp.bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -595,10 +620,14 @@ public class Cache {
                     } else {
                         conflict_miss++;
                     }
-                    temp = new block();
+                      temp = new block();
+                    int n = binlog(block_size * 4);//calculating start of block
+                    int bloc_addr = addr >> n;//
+                    int addr1 = bloc_addr << n;
                     for (int i = 0; i < block_size * 4; i++) {
-                        temp.bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
+
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -628,11 +657,12 @@ public class Cache {
                         conflict_miss++;
                     }
                     int n = binlog(block_size * 4);
-                    int bloc_addr = addr << (32 - n);
-                    bloc_addr = addr >> (32 - n);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
+                    //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                        cache_dm[index].bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        cache_dm[index].bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         cache_dm[index].tag = tag;
                         cache_dm[index].valid = true;
                     }
@@ -652,9 +682,13 @@ public class Cache {
                         capacity_miss++;
                     }
                     temp = new block();
+                    int n = binlog(block_size * 4);
+                    int bloc_addr = addr >> n;//calcualting starting addr of block
+                    int addr1 = bloc_addr << n; //
+                    //bloc_addr = addr >> (32 - n);
                     for (int i = 0; i < block_size * 4; i++) {
-                        temp.bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -678,9 +712,13 @@ public class Cache {
                         conflict_miss++;
                     }
                     temp = new block();
+                    int n = binlog(block_size * 4);//calculating start of block
+                    int bloc_addr = addr >> n;//
+                    int addr1 = bloc_addr << n;
                     for (int i = 0; i < block_size * 4; i++) {
-                        temp.bytes[i] = mem.getOrDefault(addr + i, "00000000");
-                        calculate_addr(addr + i);
+                        calculate_addr(addr1 + i);
+                        temp.bytes[i] = mem.getOrDefault(addr1 + i, "00000000");
+
                         temp.tag = tag;
                         temp.valid = true;
                     }
@@ -697,6 +735,5 @@ public class Cache {
         }
         return mem.get(addr + 1) + mem.get(addr);
     }
-
 
 }
