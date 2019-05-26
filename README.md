@@ -1,5 +1,5 @@
 # risc-v-simulator
-to run go to cornflakes folder and type following commands in terminal\
+to run go to cornflakes folder and type following commands in terminal
 
 javac ./assembler/NewJFrame.java
 
