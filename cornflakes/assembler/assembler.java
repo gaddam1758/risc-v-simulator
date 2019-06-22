@@ -39,12 +39,13 @@ public class assembler {
 		 * wrapper class for generic instruction
      */
 
-    int line_no = 0,pc = 0;
+    int line_no = 0, pc = 0;
     ArrayList<label> labels = new ArrayList<label>();
     ArrayList<instruction> instructions = new ArrayList<instruction>();
     instruction[] instructions_temp;
     int data_address = 0x10000000;
     Map< String, Integer> data_map = new HashMap< String, Integer>();
+    ArrayList<String> instruction_list = new ArrayList<>();
 
     <instructions> void assemble(String file_location, primary_memory memory) throws IOException {
         File file = new File(file_location);
@@ -61,8 +62,9 @@ public class assembler {
         }
         //line =br.readLine();
         while (line != null) {
-            if(line=="\n")
+            if (line == "\n") {
                 continue;
+            }
             LexicalAnalyser temp = new LexicalAnalyser(line, false);
             if (temp.islabel == true) {
                 label temp1 = new label(line_no, temp.label);
@@ -92,21 +94,18 @@ public class assembler {
         if (".word".equals(tokenlist.Tokens.get(1))) {
             data_map.put(label, new Integer(data_address));
             for (int i = 2; i < tokenlist.Tokens.size(); i++) {
-            	if(data_address%4 == 0)
-            	{
-            		System.out.println(data_address+"fir");
-            		memory.storeword(data_address, Integer.parseInt(tokenlist.Tokens.get(i)));
-            		System.out.println(Integer.parseInt(tokenlist.Tokens.get(i)));
-            		data_address += 4;
-            	}
-            	else
-            	{
-            		data_address = data_address>>2;
-                        data_address=data_address<<2;
-            		System.out.println(data_address+"ro");
-            		memory.storeword(data_address, Integer.parseInt(tokenlist.Tokens.get(i)));
-            		data_address += 4;
-            	}
+                if (data_address % 4 == 0) {
+                    System.out.println(data_address + "fir");
+                    memory.storeword(data_address, Integer.parseInt(tokenlist.Tokens.get(i)));
+                    System.out.println(Integer.parseInt(tokenlist.Tokens.get(i)));
+                    data_address += 4;
+                } else {
+                    data_address = data_address >> 2;
+                    data_address = data_address << 2;
+                    System.out.println(data_address + "ro");
+                    memory.storeword(data_address, Integer.parseInt(tokenlist.Tokens.get(i)));
+                    data_address += 4;
+                }
             }
 
         }
@@ -119,26 +118,23 @@ public class assembler {
             }
 
         }
-       if(".asciiz".equals(tokenlist.Tokens.get(1)))
-       {
-    	   data_map.put(label, data_address);
-           String temp=tokenlist.Tokens.get(2);
-    	   for (int i = 3; i < tokenlist.Tokens.size(); i++) {
-              temp=temp+' '+tokenlist.Tokens.get(i);
-           }
-           if(temp.charAt(0)!='"'&&temp.charAt(temp.length()-1)!='"')
-           {
-               System.out.println("inavalid string");
-               return;
-           }
-           for(int i=1;i<temp.length()-1;i++)
-           {
-               int a=(int)temp.charAt(i);
-               memory.storebyte(data_address, a);
-               data_address++;
-           }
-       }
-        
+        if (".asciiz".equals(tokenlist.Tokens.get(1))) {
+            data_map.put(label, data_address);
+            String temp = tokenlist.Tokens.get(2);
+            for (int i = 3; i < tokenlist.Tokens.size(); i++) {
+                temp = temp + ' ' + tokenlist.Tokens.get(i);
+            }
+            if (temp.charAt(0) != '"' && temp.charAt(temp.length() - 1) != '"') {
+                System.out.println("inavalid string");
+                return;
+            }
+            for (int i = 1; i < temp.length() - 1; i++) {
+                int a = (int) temp.charAt(i);
+                memory.storebyte(data_address, a);
+                data_address++;
+            }
+        }
+
     }
 
     void parse_instruction(LexicalAnalyser tokenlist) {
@@ -164,6 +160,12 @@ public class assembler {
                     System.out.println("no such register found");
                 }
                 instruction temp2 = new instruction(instr, r1, r2, r3);
+                StringBuilder stemp = new StringBuilder();
+                for (int i = 0; i < tokenlist.Tokens.size(); i++) {
+                    stemp.append(tokenlist.Tokens.get(i)).append(" ");
+                }
+                stemp.deleteCharAt(stemp.length() - 1);
+                instruction_list.add(stemp.toString());
                 instructions.add(temp2);
             } else if (temp == "i" || temp == "s") {
                 temp = tokenlist.Tokens.get(1);
@@ -174,19 +176,25 @@ public class assembler {
                 temp = tokenlist.Tokens.get(2);
                 int r2 = registers.indexOf(temp);
                 if (tokenlist.Tokens.size() == 3) {
-                	r2 = 65536;
+                    r2 = 65536;
                     int addre = data_map.get(temp);
-                    int pc = (line_no)*4;
+                    int pc = (line_no) * 4;
                     instr = "auipc";
                     int off = addre - (268435456 + pc);
-                    System.out.println(off+"-"+addre+"-"+pc);
+                    System.out.println(off + "-" + addre + "-" + pc);
                     instruction temp2 = new instruction(instr, r1, r2);
                     instructions.add(temp2);
                     instr = "lw";
                     r2 = off;
                     int r3 = r1;
-                    System.out.println(instr+"-"+r1+"-"+r2+"-"+r3);
-                    temp2 = new instruction(instr,r1,r2,r3);
+                    System.out.println(instr + "-" + r1 + "-" + r2 + "-" + r3);
+                    temp2 = new instruction(instr, r1, r2, r3);
+                    StringBuilder stemp = new StringBuilder();
+                    for (int i = 0; i < tokenlist.Tokens.size(); i++) {
+                        stemp.append(tokenlist.Tokens.get(i)).append(" ");
+                    }
+                    stemp.deleteCharAt(stemp.length() - 1);
+                    instruction_list.add(stemp.toString());
                     instructions.add(temp2);
                     line_no++;
                     return;
@@ -208,6 +216,12 @@ public class assembler {
                     }
                 }
                 instruction temp2 = new instruction(instr, r1, r2, r3);
+                StringBuilder stemp = new StringBuilder();
+                for (int i = 0; i < tokenlist.Tokens.size(); i++) {
+                    stemp.append(tokenlist.Tokens.get(i)).append(" ");
+                }
+                stemp.deleteCharAt(stemp.length() - 1);
+                instruction_list.add(stemp.toString());
                 instructions.add(temp2);
             } else if (temp == "u") {
                 temp = tokenlist.Tokens.get(1);
@@ -218,6 +232,12 @@ public class assembler {
                 temp = tokenlist.Tokens.get(2);
                 int r2 = Integer.parseInt(temp);
                 instruction temp2 = new instruction(instr, r1, r2);
+                StringBuilder stemp = new StringBuilder();
+                for (int i = 0; i < tokenlist.Tokens.size(); i++) {
+                    stemp.append(tokenlist.Tokens.get(i)).append(" ");
+                }
+                stemp.deleteCharAt(stemp.length() - 1);
+                instruction_list.add(stemp.toString());
                 instructions.add(temp2);
             } else if (temp == "sb") {
                 temp = tokenlist.Tokens.get(1);
@@ -232,6 +252,12 @@ public class assembler {
                 }
                 temp = tokenlist.Tokens.get(3);
                 instruction temp2 = new instruction(instr, r1, r2, temp);
+                StringBuilder stemp = new StringBuilder();
+                for (int i = 0; i < tokenlist.Tokens.size(); i++) {
+                    stemp.append(tokenlist.Tokens.get(i)).append(" ");
+                }
+                stemp.deleteCharAt(stemp.length() - 1);
+                instruction_list.add(stemp.toString());
                 instructions.add(temp2);
             } else if (temp == "uj") {
 
@@ -242,231 +268,219 @@ public class assembler {
                 }
                 temp = tokenlist.Tokens.get(2);
                 instruction temp2 = new instruction(instr, r1, temp);
+                StringBuilder stemp = new StringBuilder();
+                for (int i = 0; i < tokenlist.Tokens.size(); i++) {
+                    stemp.append(tokenlist.Tokens.get(i)).append(" ");
+                }
+                stemp.deleteCharAt(stemp.length() - 1);
+                instruction_list.add(stemp.toString());
                 instructions.add(temp2);
-            }
-            else if(temp == "pi")
-            {
-            	switch(instr)
-            	{
-            	case "la":
-            		String reg = tokenlist.Tokens.get(1);
-                    int r1 = registers.indexOf(reg);
-                    if (r1 == -1) {
-                        System.out.println("no such register found");
-                    }
-                    String lab = tokenlist.Tokens.get(2);
-                    System.out.println(lab);
-                    if(data_map.get(lab)!=null)
-                    {
-                    	int addr = data_map.get(lab);
-                    	System.out.println(addr+"this"+line_no);
-                    	int pc = (line_no)*4;
-                    	int offset = addr - (268435456 + pc);
-                    	System.out.println(pc+"line"+addr);
-                    	instr = "auipc";
-                    	int r2 = 65536;
-                    	instruction temp2 = new instruction(instr,r1,r2);
-                    	instructions.add(temp2);
-                    	instr = "addi";
-                    	r2 = r1;
-                    	int r3 = offset;
-                    	System.out.println(instr+"-"+r1+"-"+r2+"-"+r3);
-                    	temp2 = new instruction(instr,r1,r2,r3);
-                    	instructions.add(temp2);
-                    	line_no++;
-                    	/*
+            } else if (temp == "pi") {
+                switch (instr) {
+                    case "la":
+                        StringBuilder stemp=new StringBuilder();
+                        String reg = tokenlist.Tokens.get(1);
+                        int r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        String lab = tokenlist.Tokens.get(2);
+                        System.out.println(lab);
+                        if (data_map.get(lab) != null) {
+                            int addr = data_map.get(lab);
+                            System.out.println(addr + "this" + line_no);
+                            int pc = (line_no) * 4;
+                            int offset = addr - (268435456 + pc);
+                            System.out.println(pc + "line" + addr);
+                            instr = "auipc";
+                            int r2 = 65536;
+                            instruction temp2 = new instruction(instr, r1, r2);
+                            stemp.append(instr+" "+reg+" "+Integer.toString(r2));
+                            instruction_list.add(stemp.toString());
+                            instructions.add(temp2);
+                            instr = "addi";
+                            r2 = r1;
+                            int r3 = offset;
+                            System.out.println(instr + "-" + r1 + "-" + r2 + "-" + r3);
+                            temp2 = new instruction(instr, r1, r2, r3);
+                            instructions.add(temp2);
+                            line_no++;
+                            /*
                     	 * here goes the start address for the auipc of the la instruction
-                    	 */
-                    	
-                    }
-                    else
-                    {
-                    	System.out.println("no such label found 1");
-                    }
-                    
-                    break;
-                	
-                case "li":
-                	System.out.println("in correct");
-                	 reg = tokenlist.Tokens.get(1);
-                	 r1 = registers.indexOf(reg);
-                	if(r1 == -1)
-                	{
-                		System.out.println("no such register found");
-                	}
-                	int r2 = 0;
-                	 reg = tokenlist.Tokens.get(2);
-                	int r3 = Integer.parseInt(reg);
-                	instr = "addi";
-                	instruction temp2 = new instruction(instr, r1, r2, r3);
-                    instructions.add(temp2);
-                	break;
-                
-                case "mv":
-                	reg = tokenlist.Tokens.get(1);
-               	 	r1 = registers.indexOf(reg);
-               	 	if(r1 == -1)
-               	 	{
-               	 		System.out.println("no such register found");
-               	 	}
-               	 	reg = tokenlist.Tokens.get(2);
-               	 	r2 = registers.indexOf(reg);
-               	 	if(r2 == -1)
-            	 	{
-            	 		System.out.println("no such register found");
-            	 	}
-               	 	r3 = 0;
-               	 	instr = "addi";
-               	 	temp2 = new instruction(instr,r1,r2,r3);
-               	 	instructions.add(temp2);
-               	 	break;
-                	
-                case "neg":
-                	reg = tokenlist.Tokens.get(1);
-               	 	r1 = registers.indexOf(reg);
-               	 	if(r1 == -1)
-               	 	{
-               	 		System.out.println("no such register found");
-               	 	}
-               	 	reg = tokenlist.Tokens.get(2);
-               	 	r3 = registers.indexOf(reg);
-            	 	if(r3 == -1)
-            	 	{
-            	 		System.out.println("no such register found");
-            	 	}
-            	 	r2 = 0;
-            	 	instr = "sub";
-            	 	temp2 = new instruction(instr,r1,r2,r3);
-            	 	instructions.add(temp2);
-            	 	break;
-                	
-                case "nop":
-                	r1 = 0;
-                	r2 = 0;
-                	r3 = 0;
-                	instr = "addi";
-                	temp2 = new instruction(instr,r1,r2,r3);
-                	instructions.add(temp2);
-                	break;
-                	
-                case "not":
-                	reg = tokenlist.Tokens.get(1);
-               	 	r1 = registers.indexOf(reg);
-               	 	if(r1 == -1)
-               	 	{
-               	 		System.out.println("no such register found");
-               	 	}
-               	 	reg = tokenlist.Tokens.get(1);
-            	 	r2 = registers.indexOf(reg);
-            	 	if(r2 == -1)
-            	 	{
-            	 		System.out.println("no such register found");
-            	 	}
-            	 	r3 = -1;
-            	 	instr = "xori";
-            	 	temp2 = new instruction(instr,r1,r2,r3);
-            	 	instructions.add(temp2);
-            	 	break;
-            	 	
-                	
-                case "ret":
-                	r1 = 0;
-                	r2 = 1;
-                	r3 = 0;
-                	instr = "jalr";
-                	temp2 = new instruction(instr,r1,r2,r3);
-                	instructions.add(temp2);
-                	break;
-                	
-                case "seqz":
-                	reg = tokenlist.Tokens.get(1);
-               	 	r1 = registers.indexOf(reg);
-               	 	if(r1 == -1)
-               	 	{
-               	 		System.out.println("no such register found");
-               	 	}
-               	 	reg = tokenlist.Tokens.get(2);
-            	 	r2 = registers.indexOf(reg);
-            	 	if(r2 == -1)
-            	 	{
-            	 		System.out.println("no such register found");
-            	 	}
-            	 	r3 = 1;
-            	 	instr = "sltiu";
-            	 	temp2 = new instruction(instr,r1,r2,r3);
-            	 	instructions.add(temp2);
-            	 	break;
-                	
-                case "snez":
-                	reg = tokenlist.Tokens.get(1);
-               	 	r1 = registers.indexOf(reg);
-               	 	if(r1 == -1)
-               	 	{
-               	 		System.out.println("no such register found");
-               	 	}
-               	 	r2 = 0;
-               	 	reg = tokenlist.Tokens.get(1);
-            	 	r3 = registers.indexOf(reg);
-            	 	if(r3 == -1)
-            	 	{
-            	 		System.out.println("no such register found");
-            	 	}
-               	 	instr = "sltu";
-               	 	temp2 = new instruction(instr,r1,r2,r3);
-               	 	instructions.add(temp2);
-               	 	break;
-                	
-                case "jr":
-                	r1 = 0;
-                	reg = tokenlist.Tokens.get(1);
-               	 	r2 = registers.indexOf(reg);
-               	 	if(r2 == -1)
-               	 	{
-               	 		System.out.println("no such register found");
-               	 	}
-               	 	r3 = 0;
-               	 	instr = "jalr";
-               	 	temp2 = new instruction(instr,r1,r2,r3);
-               	 	instructions.add(temp2);
-               	 	break;
-                	
-                case "j":
-                	r1 = 0;
-                	reg = tokenlist.Tokens.get(1);
-                	instr = "jal";
-                	temp2 = new instruction(instr,r1,reg);
-                	instructions.add(temp2);
-                	break;
-                	
-                case "bnez":
-                	reg = tokenlist.Tokens.get(1);
-               	 	r1 = registers.indexOf(reg);
-               	 	if(r1 == -1)
-               	 	{
-               	 		System.out.println("no such register found");
-               	 	}
-               	 	r2 = 0;
-               	 	reg = tokenlist.Tokens.get(2);
-               	 	instr = "bne";
-               	 	temp2 = new instruction(instr,r1,r2,reg);
-               	 	instructions.add(temp2);
-               	 	break;
-                	
-                case "beqz":
-                	reg = tokenlist.Tokens.get(1);
-               	 	r1 = registers.indexOf(reg);
-               	 	if(r1 == -1)
-               	 	{
-               	 		System.out.println("no such register found");
-               	 	}
-               	 	r2 = 0;
-               	 	reg = tokenlist.Tokens.get(2);
-               	 	instr = "beq";
-               	 	temp2 = new instruction(instr,r1,r2,reg);
-               	 	instructions.add(temp2);
-               	 	break;
-                	
-            	}
+                             */
+
+                        } else {
+                            System.out.println("no such label found 1");
+                        }
+
+                        break;
+
+                    case "li":
+                        System.out.println("in correct");
+                        reg = tokenlist.Tokens.get(1);
+                        r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        int r2 = 0;
+                        reg = tokenlist.Tokens.get(2);
+                        int r3 = Integer.parseInt(reg);
+                        instr = "addi";
+                        instruction temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "mv":
+                        reg = tokenlist.Tokens.get(1);
+                        r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        reg = tokenlist.Tokens.get(2);
+                        r2 = registers.indexOf(reg);
+                        if (r2 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        r3 = 0;
+                        instr = "addi";
+                        temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "neg":
+                        reg = tokenlist.Tokens.get(1);
+                        r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        reg = tokenlist.Tokens.get(2);
+                        r3 = registers.indexOf(reg);
+                        if (r3 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        r2 = 0;
+                        instr = "sub";
+                        temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "nop":
+                        r1 = 0;
+                        r2 = 0;
+                        r3 = 0;
+                        instr = "addi";
+                        temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "not":
+                        reg = tokenlist.Tokens.get(1);
+                        r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        reg = tokenlist.Tokens.get(1);
+                        r2 = registers.indexOf(reg);
+                        if (r2 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        r3 = -1;
+                        instr = "xori";
+                        temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "ret":
+                        r1 = 0;
+                        r2 = 1;
+                        r3 = 0;
+                        instr = "jalr";
+                        temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "seqz":
+                        reg = tokenlist.Tokens.get(1);
+                        r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        reg = tokenlist.Tokens.get(2);
+                        r2 = registers.indexOf(reg);
+                        if (r2 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        r3 = 1;
+                        instr = "sltiu";
+                        temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "snez":
+                        reg = tokenlist.Tokens.get(1);
+                        r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        r2 = 0;
+                        reg = tokenlist.Tokens.get(1);
+                        r3 = registers.indexOf(reg);
+                        if (r3 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        instr = "sltu";
+                        temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "jr":
+                        r1 = 0;
+                        reg = tokenlist.Tokens.get(1);
+                        r2 = registers.indexOf(reg);
+                        if (r2 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        r3 = 0;
+                        instr = "jalr";
+                        temp2 = new instruction(instr, r1, r2, r3);
+                        instructions.add(temp2);
+                        break;
+
+                    case "j":
+                        r1 = 0;
+                        reg = tokenlist.Tokens.get(1);
+                        instr = "jal";
+                        temp2 = new instruction(instr, r1, reg);
+                        instructions.add(temp2);
+                        break;
+
+                    case "bnez":
+                        reg = tokenlist.Tokens.get(1);
+                        r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        r2 = 0;
+                        reg = tokenlist.Tokens.get(2);
+                        instr = "bne";
+                        temp2 = new instruction(instr, r1, r2, reg);
+                        instructions.add(temp2);
+                        break;
+
+                    case "beqz":
+                        reg = tokenlist.Tokens.get(1);
+                        r1 = registers.indexOf(reg);
+                        if (r1 == -1) {
+                            System.out.println("no such register found");
+                        }
+                        r2 = 0;
+                        reg = tokenlist.Tokens.get(2);
+                        instr = "beq";
+                        temp2 = new instruction(instr, r1, r2, reg);
+                        instructions.add(temp2);
+                        break;
+
+                }
             }
         }
     }
@@ -585,31 +599,31 @@ public class assembler {
             case "jal":
                 return "uj";
             case "la":
-            	return "pi";
+                return "pi";
             case "li":
-            	return "pi";
+                return "pi";
             case "mv":
-            	return "pi";
+                return "pi";
             case "neg":
-            	return "pi";
+                return "pi";
             case "nop":
-            	return "pi";
+                return "pi";
             case "not":
-            	return "pi";
+                return "pi";
             case "ret":
-            	return "pi";
+                return "pi";
             case "seqz":
-            	return "pi";
+                return "pi";
             case "snez":
-            	return "pi";
+                return "pi";
             case "jr":
-            	return "pi";
+                return "pi";
             case "j":
-            	return "pi";
+                return "pi";
             case "bnez":
-            	return "pi";
+                return "pi";
             case "beqz":
-            	return "pi";
+                return "pi";
         }
         return null;
     }

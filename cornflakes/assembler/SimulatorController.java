@@ -9,8 +9,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -40,6 +40,8 @@ public class SimulatorController implements Initializable {
     @FXML
     private TableColumn<MTable,String>MCColumn;
     @FXML
+    private TableColumn<MTable,String>ACColumn;
+    @FXML
     private Button assemble;
 
     /**
@@ -50,6 +52,7 @@ public class SimulatorController implements Initializable {
         machineCodeTable.setPlaceholder(null);
         PCColumn.setCellValueFactory(new PropertyValueFactory<MTable,String>("Pc"));
         MCColumn.setCellValueFactory(new PropertyValueFactory<MTable,String>("MachineCode"));
+        ACColumn.setCellValueFactory(new PropertyValueFactory<MTable,String>("AssemblyCode"));
        machineCodeTable.setItems(list);
        
     } 
@@ -59,7 +62,7 @@ public class SimulatorController implements Initializable {
      * this method will return pc and machine code values as a ObservableList For Table
      * @return 
      */
-    public ObservableList<MTable> getMTableList(String filename) throws IOException
+    public ObservableList<MTable> getMTableList(String filename,ArrayList<String> assemblyCode) throws IOException
     {
         
      BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -68,11 +71,11 @@ public class SimulatorController implements Initializable {
             String line = null;
             while ((line = reader.readLine()) != null) {
                 String temp=String.format("0x%08X", pc);
-                list.add(new MTable(temp,line));
+                list.add(new MTable(temp,line,assemblyCode.get(pc/4)));
                 pc=pc+4;
             }
             if(list.size()==0)
-                list.add(new MTable("",""));
+                list.add(new MTable("","",""));
         return list;
     }
     @FXML
