@@ -77,7 +77,6 @@ public class NewFXMain extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         //filemenu actions;
-        System.out.println("Asas");
         setMenuItemsEvents();
 
         File.getItems().addAll(New, Open, Save, SaveAs);
@@ -140,7 +139,7 @@ public class NewFXMain extends Application {
                 Parent parent=loader.load();
                 simulator_scene=new Scene(parent,1000,500);
                 SimulatorController controller=loader.getController();
-                controller.getMTableList(outputfile,obj.instruction_list);
+                controller.transfeBetweenScenes(outputfile,obj.instruction_list,memory);
                 primaryStage.setScene(simulator_scene);
             } catch (IOException ex) {
                 Logger.getLogger(NewFXMain.class.getName()).log(Level.SEVERE, null, ex);
