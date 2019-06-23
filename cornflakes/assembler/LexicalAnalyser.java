@@ -32,8 +32,11 @@ class LexicalAnalyser
 				boolean foundcomment = false;
 				boolean isDelimitter = false;
 				StringBuilder str = new StringBuilder();
-				char temp = line.charAt(0);
-			
+				char temp;
+				if(line.length() > 0)
+				{
+					temp = line.charAt(0);
+				}
 				int i = 0;
 				while  (i< line.length())
 					{
