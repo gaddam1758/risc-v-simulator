@@ -56,6 +56,7 @@ public class SimulatorController implements Initializable {
     boolean disable_writing_to_pipelined_regs = false;
     boolean watch_pipline_reg = false;
     boolean stall_decode = false;
+    int current_index=0;
     @FXML
     private TableView registersTable;
     @FXML
@@ -107,6 +108,7 @@ public class SimulatorController implements Initializable {
         c5.setCellValueFactory(new PropertyValueFactory<memtab, String>("address_3"));
         machineCodeTable.setItems(Mlist);
         registersTable.setItems(Rlist);
+        memoryTab.setItems(this.memlist);
     }
 
     /**
@@ -162,20 +164,20 @@ public class SimulatorController implements Initializable {
     public ObservableList<memtab> getMemTableList(int index) {
         int id = index >> 2;
         id = id << 2;
-        id = id - 28;//plus or minus seven addresses in a table;
+        id = id +28;//plus or minus seven addresses in a table;
         memlist.removeAll();
         for (int i = 0; i < 20; i++) {
             if (id >= 0 && id < 0x7FFFFFF0) {
                 String s1 = String.format("0x%08X", id);
-                String s2 = primary_memory.mem.getOrDefault(id + 0, "0");
-                String s3 = primary_memory.mem.getOrDefault(id + 1, "0");
-                String s4 = primary_memory.mem.getOrDefault(id + 2, "0");
-                String s5 = primary_memory.mem.getOrDefault(id + 3, "0");
+                String s2 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 0, "0"),2)));
+                String s3 =Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 1, "0"),2)));
+                String s4 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 2, "0"),2)));
+                String s5 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 3, "0"),2)));;
                 memlist.add(new memtab(s1,s2,s3,s4,s5));
             } else {
                 memlist.add(new memtab("","","","",""));
             }
-            id = id + 4;
+            id = id - 4;
         }
         return memlist;
     }
@@ -217,6 +219,8 @@ public class SimulatorController implements Initializable {
         );
         registersTable.getItems().clear();
         registersTable.setItems(getRTableList());
+        this.memoryTab.getItems().clear();
+        this.memoryTab.setItems(this.getMemTableList(current_index));
     }
 
     @FXML
@@ -229,13 +233,53 @@ public class SimulatorController implements Initializable {
     /**
      * class memory tab pagination
      */
-    public class memtab {
+    public static class memtab {
 
         SimpleStringProperty address;
         SimpleStringProperty address_0;
         SimpleStringProperty address_1;
         SimpleStringProperty address_2;
         SimpleStringProperty address_3;
+
+        public String getAddress() {
+            return address.get();
+        }
+
+        public void setAddress(SimpleStringProperty address) {
+            this.address = address;
+        }
+
+        public String getAddress_0() {
+            return address_0.get();
+        }
+
+        public void setAddress_0(SimpleStringProperty address_0) {
+            this.address_0 = address_0;
+        }
+
+        public String getAddress_1() {
+            return address_1.get();
+        }
+
+        public void setAddress_1(SimpleStringProperty address_1) {
+            this.address_1 = address_1;
+        }
+
+        public String getAddress_2() {
+            return address_2.get();
+        }
+
+        public void setAddress_2(SimpleStringProperty address_2) {
+            this.address_2 = address_2;
+        }
+
+        public String getAddress_3() {
+            return address_3.get();
+        }
+
+        public void setAddress_3(SimpleStringProperty address_3) {
+            this.address_3 = address_3;
+        }
 
         public memtab(String address, String address_0, String address_1, String address_2, String address_3) {
             this.address = new SimpleStringProperty(address);
