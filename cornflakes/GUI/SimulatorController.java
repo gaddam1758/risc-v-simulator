@@ -23,6 +23,7 @@ import java.util.Stack;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -32,6 +33,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
@@ -99,6 +101,14 @@ public class SimulatorController implements Initializable {
     private ComboBox<?> memComboBox;
     @FXML
     private Button step;
+    @FXML
+    private Button prev;
+    @FXML
+    private TextField memTextfield;
+    @FXML
+    private Button memUpButton;
+    @FXML
+    private Button memDownButton;
 
     /**
      * Initializes the controller class.
@@ -188,8 +198,13 @@ public class SimulatorController implements Initializable {
     }
 
     public ObservableList<memtab> getMemTableList(int index) {
+        if(index<0)
+            index=0;
+        if(index>0x7FFFFFF0)
+            index=0x7FFFFFF0-1;
         int id = index >> 2;
         id = id << 2;
+        this.current_index=id;
         id = id + 28;//plus or minus seven addresses in a table;
         memlist.removeAll();
         for (int i = 0; i < 20; i++) {
@@ -268,6 +283,7 @@ public class SimulatorController implements Initializable {
         this.memoryTab.getItems().clear();
         this.memoryTab.setItems(this.getMemTableList(current_index));
     }
+
     @FXML
     void prevButtonAction() {
         if (!memStack.empty() && !this.datStack.empty()) {
@@ -278,6 +294,27 @@ public class SimulatorController implements Initializable {
         registersTable.setItems(getRTableList());
         this.memoryTab.getItems().clear();
         this.memoryTab.setItems(this.getMemTableList(current_index));
+    }
+
+    /*
+    go to method for memory table
+     */
+    @FXML
+    void gotoLocation() {
+        try{
+        String temp=this.memTextfield.getText().strip();
+        String temp1=temp.substring(2,temp.length());
+        int loc=Integer.parseInt(temp1,16);
+        
+        this.memoryTab.getItems().clear();
+        this.memoryTab.setItems(this.getMemTableList(loc));
+        
+        }
+        catch(Exception e)
+        {
+            
+        }
+       
     }
 
     @FXML
@@ -329,6 +366,18 @@ public class SimulatorController implements Initializable {
         dat.disable_writing_to_pipelined_regs = disable_writing_to_pipelined_regs;
         dat.watch_pipline_reg = watch_pipline_reg;
         dat.stall_decode = stall_decode;
+    }
+
+    @FXML
+    private void memUpButtonAction(ActionEvent event) {
+        this.memoryTab.getItems().clear();
+        this.memoryTab.setItems(this.getMemTableList(current_index+28));//+7 addresses
+    }
+
+    @FXML
+    private void memDownButtonAction(ActionEvent event) {
+        this.memoryTab.getItems().clear();
+        this.memoryTab.setItems(this.getMemTableList(current_index-7));//-7 addresses
     }
 
     /**
