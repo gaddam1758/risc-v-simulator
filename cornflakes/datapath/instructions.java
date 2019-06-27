@@ -1,7 +1,8 @@
 
 package datapath;
 import assembler.primary_memory;
-public class instructions
+import java.io.Serializable;
+public class instructions implements Serializable
 {
 
     int hazard_type_rs1,hazard_type_rs2;

@@ -2,15 +2,10 @@ package datapath;
 import assembler.primary_memory;
 
 import java.util.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
+import java.io.Serializable;
 
 
-public class datapath
+public class datapath implements Serializable
 {
 
 	//knobs and stats

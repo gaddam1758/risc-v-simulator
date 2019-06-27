@@ -1,8 +1,9 @@
 package assembler;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class primary_memory {
+public class primary_memory implements Serializable{
 
     //
     public static Map<Integer, String> mem;
@@ -28,7 +29,7 @@ public class primary_memory {
     public int cold_miss;
     public int conflict_miss;
     public int capacity_miss;
-
+   
     public int parseint(String binaryInt, int t) {
         //Check if the number is negative.
         //We know it's negative if it starts with a 1

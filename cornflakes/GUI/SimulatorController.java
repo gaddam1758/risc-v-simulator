@@ -9,16 +9,17 @@ import assembler.*;
 import datapath.datapath;
 import datapath.instructions;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Stack;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,8 +27,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Pagination;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -60,6 +61,10 @@ public class SimulatorController implements Initializable {
     boolean watch_pipline_reg = false;
     boolean stall_decode = false;
     int current_index = 0;
+    Stack<primary_memory> memStack = new Stack<>();
+    Stack<datapath> datStack = new Stack<>();
+    datapath dat;
+    instructions[] instr_que;
     @FXML
     private TableView registersTable;
     @FXML
@@ -90,6 +95,10 @@ public class SimulatorController implements Initializable {
     TableColumn<memtab, String> c4;
     @FXML
     TableColumn<memtab, String> c5;
+    @FXML
+    private ComboBox<?> memComboBox;
+    @FXML
+    private Button step;
 
     /**
      * Initializes the controller class.
@@ -201,6 +210,87 @@ public class SimulatorController implements Initializable {
 
     @FXML
     void runButtonAction() {
+        setRun();
+        boolean flag;
+        while (true) {
+            //n--;
+
+            dat.print_reg(memory);
+            dat.prev_pc = dat.cur_pc;
+            flag = dat.fetch(memory, instr_que);
+            dat.write(memory, instr_que);
+            dat.print_reg(memory);
+            dat.decode(memory, instr_que);
+            dat.execute(memory, instr_que);
+            dat.no_of_cycles++;
+            this.highlightingRow(dat.cur_pc);
+            //print_que(instr_que);
+            if (dat.memory(memory, instr_que) && !flag) {
+                break;
+            }
+
+        }
+        dat.calculate_data();
+        dat.print_summary();
+//
+        registersTable.getItems().clear();
+        registersTable.setItems(getRTableList());
+        this.memoryTab.getItems().clear();
+        this.memoryTab.setItems(this.getMemTableList(current_index));
+    }
+
+    @FXML
+    void stepButtonAction() {
+        if (memStack.empty() && this.datStack.empty()) {
+            setRun();
+        }
+        memStack.push((primary_memory) deepCopy(memory));
+        datStack.push((datapath) deepCopy(dat));
+        boolean flag;
+        for (int i = 0; i < 5; i++) {
+            dat.print_reg(memory);
+            dat.prev_pc = dat.cur_pc;
+            flag = dat.fetch(memory, instr_que);
+            dat.write(memory, instr_que);
+            dat.print_reg(memory);
+            dat.decode(memory, instr_que);
+            dat.execute(memory, instr_que);
+            dat.no_of_cycles++;
+            this.highlightingRow(dat.cur_pc);
+            dat.print_que(instr_que);
+            dat.memory(memory, instr_que);
+        }
+        dat.calculate_data();
+        dat.print_summary();
+//      
+        registersTable.getItems().clear();
+        registersTable.setItems(getRTableList());
+        this.memoryTab.getItems().clear();
+        this.memoryTab.setItems(this.getMemTableList(current_index));
+    }
+    @FXML
+    void prevButtonAction() {
+        if (!memStack.empty() && !this.datStack.empty()) {
+            memory = memStack.pop();
+            dat = datStack.pop();
+        }
+        registersTable.getItems().clear();
+        registersTable.setItems(getRTableList());
+        this.memoryTab.getItems().clear();
+        this.memoryTab.setItems(this.getMemTableList(current_index));
+    }
+
+    @FXML
+    void editorButtonAction() {
+
+        window.setScene(original_scene);
+
+    }
+
+    /**
+     * preprocess function for step
+     */
+    void setRun() {
         File file = new File(filename);
 
         int mem_index = 0;
@@ -225,12 +315,11 @@ public class SimulatorController implements Initializable {
         } catch (Exception e) {
             System.out.println(e);
         }
-        datapath dat = new datapath();
+        dat = new datapath();
 //
         dat.cur_pc = 0;
         memory.pc = 0;
-        boolean flag;
-        instructions[] instr_que = new instructions[5];
+        instr_que = new instructions[5];
         for (instructions i : instr_que) {
             i = null;
         }
@@ -240,39 +329,6 @@ public class SimulatorController implements Initializable {
         dat.disable_writing_to_pipelined_regs = disable_writing_to_pipelined_regs;
         dat.watch_pipline_reg = watch_pipline_reg;
         dat.stall_decode = stall_decode;
-        //int n=30;
-        while (true) {
-            //n--;
-
-            dat.print_reg(memory);
-            dat.prev_pc = dat.cur_pc;
-            flag = dat.fetch(memory, instr_que);
-            dat.write(memory, instr_que);
-            dat.print_reg(memory);
-            dat.decode(memory, instr_que);
-            dat.execute(memory, instr_que);
-            dat.no_of_cycles++;
-           this.a(dat.cur_pc);
-            //print_que(instr_que);
-            if (dat.memory(memory, instr_que) && !flag) {
-                break;
-            }
-
-        }
-        dat.calculate_data();
-        dat.print_summary();
-//
-        registersTable.getItems().clear();
-        registersTable.setItems(getRTableList());
-        this.memoryTab.getItems().clear();
-        this.memoryTab.setItems(this.getMemTableList(current_index));
-    }
-
-    @FXML
-    void editorButtonAction() {
-
-        window.setScene(original_scene);
-
     }
 
     /**
@@ -335,21 +391,37 @@ public class SimulatorController implements Initializable {
         }
 
     }
-    public void a(int a)
-    {
-         machineCodeTable.setRowFactory(tv -> new TableRow<MTable>() {
-                @Override
-                public void updateItem(MTable item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item == null) {
-                        setStyle("");
-                    } else if (item.getPc().equals(String.format("0x%08X", 0))) {
-                        setStyle("-fx-background-color: tomato;");
-                    } else {
-                        setStyle("");
-                    }
+
+    public void highlightingRow(int row) {
+        machineCodeTable.setRowFactory(tv -> new TableRow<MTable>() {
+            @Override
+            public void updateItem(MTable item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null) {
+                    setStyle("");
+                } else if (item.getPc().equals(String.format("0x%08X", 0))) {
+                    setStyle("-fx-background-color: tomato;");
+                } else {
+                    setStyle("");
                 }
-            });
+            }
+        });
     }
-   
+
+    /**
+     * Makes a deep copy of any Java object that is passed.
+     */
+    private static Object deepCopy(Object object) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
+            outputStrm.writeObject(object);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
+            return objInputStream.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

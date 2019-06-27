@@ -6,12 +6,13 @@
 package assembler;
 
 import static assembler.primary_memory.mem;
+import java.io.Serializable;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class Cache {
+public class Cache implements Serializable{
 
     int cache_size;
     int block_size;
@@ -23,7 +24,7 @@ public class Cache {
     public int conflict_miss;
     public int capacity_miss;
 
-    public class block {
+    public class block implements Serializable{
 
         int tag;
         boolean valid;
@@ -36,7 +37,7 @@ public class Cache {
         }
     }
 
-    class set {
+    class set implements Serializable{
 
         Deque<block> dq_fas = new LinkedList();
         HashSet<Integer> tag_fas;

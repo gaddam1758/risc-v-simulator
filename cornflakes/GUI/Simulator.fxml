@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="656.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="assembler.SimulatorController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="656.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.SimulatorController">
    <children>
       <MenuBar>
         <menus>
@@ -37,9 +37,11 @@
          <children>
             <Button fx:id="editor" layoutX="71.0" layoutY="1.0" mnemonicParsing="false" onAction="#editorButtonAction" text="EDITOR" />
           <Button fx:id="run" layoutX="14.0" layoutY="1.0" mnemonicParsing="false" onAction="#runButtonAction" text="RUN" />
-            <ComboBox fx:id="memComboBox" layoutX="587.0" layoutY="1.0" prefHeight="26.0" prefWidth="68.0" promptText="Text" />
+            <ComboBox fx:id="memComboBox" layoutX="749.0" layoutY="2.0" prefHeight="26.0" prefWidth="68.0" promptText="Text" />
             <Button layoutX="827.0" layoutY="1.0" mnemonicParsing="false" text="UP" />
             <Button layoutX="876.0" layoutY="2.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="57.0" text="DOWN" />
+            <Button fx:id="step" layoutX="329.0" layoutY="2.0" mnemonicParsing="false" onAction="#stepButtonAction" text="STEP" />
+            <Button fx:id="prev" layoutX="527.0" layoutY="2.0" mnemonicParsing="false" onAction="#prevButtonAction" text="PREV" />
          </children>
       </AnchorPane>
       <HBox prefHeight="336.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
