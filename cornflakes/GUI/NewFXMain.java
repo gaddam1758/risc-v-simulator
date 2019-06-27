@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package assembler;
+package GUI;
 
+import assembler.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -138,10 +139,13 @@ public class NewFXMain extends Application {
                 // p.println(assembler.instructions_temp.length);
                 p.close();
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NewFXMain.class.getName()).log(Level.SEVERE, null, ex);
             }
             FXMLLoader loader= new FXMLLoader();
+            String s=getClass().getResource("Simulator.fxml").toString();
+            System.out.println(s);
             loader.setLocation(getClass().getResource("Simulator.fxml"));
+            System.out.println(loader.getLocation().toString());
             try {
                 Parent parent=loader.load();
                 simulator_scene=new Scene(parent,1000,500);

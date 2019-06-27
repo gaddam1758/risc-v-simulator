@@ -3,7 +3,7 @@ package assembler;
 public class instruction
 
 	{
-		String binary;
+		public String binary;
 		String self_label;
 		boolean has_label;
 		boolean wants_label;
@@ -25,7 +25,7 @@ public class instruction
 			}
 
 		// r3<==>r2
-		instruction(String opcode, int r1, int r2, int r3)
+		public instruction(String opcode, int r1, int r2, int r3)
 			{
 				if (next)
 					{
@@ -179,7 +179,7 @@ public class instruction
 					}
 			}
 
-		instruction(String opcode, int r1, int iv)
+		public instruction(String opcode, int r1, int iv)
 			{
 				if (next)
 					{
@@ -203,7 +203,7 @@ public class instruction
 
 			}
 
-		instruction(String opcode, int r1, int r2, String lab)
+		public instruction(String opcode, int r1, int r2, String lab)
 			{
 				if (next)
 					{
@@ -236,7 +236,7 @@ public class instruction
 					}
 			}
 
-		instruction(String opcode, int r1, String lab)
+		public instruction(String opcode, int r1, String lab)
 			{
 				if (next)
 					{
@@ -660,7 +660,7 @@ public class instruction
 					}
 			}
 
-		static void assign_labels(instruction[] all)
+		public static void assign_labels(instruction[] all)
 			{
 				instruction temp = new instruction();
 				instruction temp_2 = new instruction();

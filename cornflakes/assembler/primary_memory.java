@@ -5,7 +5,7 @@ import java.util.*;
 public class primary_memory {
 
     //
-    static Map<Integer, String> mem;
+    public static Map<Integer, String> mem;
     //private  String[] memory;
     int stack_start = 0x7FFFFFF0;//2^28-3-1
     final int heap_start = 0x10007FE8;//2^28

@@ -1,5 +1,6 @@
-package assembler;
+package GUI;
 
+import assembler.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -12,7 +13,7 @@ import assembler.primary_memory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-
+import assembler.LexicalAnalyser;
 public class error {
 
     /*

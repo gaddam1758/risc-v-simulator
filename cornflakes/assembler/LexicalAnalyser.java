@@ -9,7 +9,7 @@ package assembler;
 
 import java.util.ArrayList;
 
-class LexicalAnalyser
+public class LexicalAnalyser
 	{
 
 		boolean ifDelimiter(char c)
@@ -21,12 +21,12 @@ class LexicalAnalyser
 
 		public ArrayList<String> Tokens = new ArrayList<String>();
 		public String label;
-		boolean islabel = false;
+		public boolean islabel = false;
 		StringBuilder word = new StringBuilder();
            
 
 		// ArrayList<Integer> tokens = new ArrayList<>(Integer);
-	LexicalAnalyser(String line,boolean assemblydirective)
+	public LexicalAnalyser(String line,boolean assemblydirective)
 			{
                                 
 				boolean foundcomment = false;

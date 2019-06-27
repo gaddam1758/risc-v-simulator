@@ -21,10 +21,10 @@ public class datapath
 	,no_of_alu_instructions,no_of_data_transfer_instructions,no_of_stalls;
 
 	double cpi;
-	int cur_pc,prev_pc,branch_pc,stalled_branch_pc,jalr_pc;
+	public int cur_pc,prev_pc,branch_pc,stalled_branch_pc,jalr_pc;
 
 	public boolean pipelined,data_forwarding,disable_writing_to_registers,disable_writing_to_pipelined_regs,watch_pipline_reg;
-	boolean stall_decode;
+	public boolean stall_decode;
 	int stalls;// this is nothing related with number of stalls
 
 	public datapath()
@@ -624,8 +624,8 @@ public class datapath
 		return ;
 	}
 
-
-	public  void run(primary_memory mem,boolean pip,
+        
+	public  void run(primary_memory mem,boolean pipelined,
 		boolean data_forwarding,
 		boolean disable_writing_to_registers,
 		boolean disable_writing_to_pipelined_regs,
@@ -637,7 +637,7 @@ public class datapath
 		boolean flag;
 		instructions[] instr_que=new instructions[5];
 		for(instructions i:instr_que)i=null;
-		pipelined=pip;
+		pipelined=pipelined;
                 this.data_forwarding=data_forwarding;
                 this.disable_writing_to_registers=disable_writing_to_registers;
                 this.disable_writing_to_pipelined_regs=disable_writing_to_pipelined_regs;
@@ -664,15 +664,15 @@ public class datapath
 		calculate_data();
 		print_summary();
 	}
-	void print_reg(primary_memory mem)
+	public void  print_reg(primary_memory mem)
 	{
 		System.out.println("ra :"+mem.ra+", rb:"+mem.rb+", rz :"+mem.rx+", ry "+mem.ry+", rm :"+mem.rm +" ");
 	}
-	void calculate_data()
+	public void  calculate_data()
 	{
 		cpi=(double)no_of_cycles/(double)no_of_instructions;
 	}
-	void print_que(instructions[] instr_que)
+	public void print_que(instructions[] instr_que)
 	{
 		System.out.println("<<<<<<<<<<<<");
 		for(int i=0;i<5;i++)
@@ -684,7 +684,7 @@ public class datapath
 		}
 		System.out.println("<<<<<<<<<<<<");
 	}
-	void print_summary()
+	public void print_summary()
 	{
 		System.out.println("\nno_of_stalls  :"+no_of_stalls+"\nno_of_cycles  :"+no_of_cycles+
 		"\nno_of_branch_mispredictions  :"+no_of_branch_mispredictions+"\nno_of_data_hazards:  "+no_of_data_hazards+

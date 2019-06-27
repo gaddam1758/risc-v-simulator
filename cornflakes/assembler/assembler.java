@@ -42,12 +42,12 @@ public class assembler {
     int line_no = 0, pc = 0;
     ArrayList<label> labels = new ArrayList<label>();
     ArrayList<instruction> instructions = new ArrayList<instruction>();
-    instruction[] instructions_temp;
+    public instruction[] instructions_temp;
     int data_address = 0x10000000;
     Map< String, Integer> data_map = new HashMap< String, Integer>();
-    ArrayList<String> instruction_list = new ArrayList<>();
+    public ArrayList<String> instruction_list = new ArrayList<>();
 
-    <instructions> void assemble(String file_location, primary_memory memory) throws IOException {
+ public   <instructions> void assemble(String file_location, primary_memory memory) throws IOException {
         File file = new File(file_location);
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line;

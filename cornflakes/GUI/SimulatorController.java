@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package assembler;
+package GUI;
 
+import assembler.*;
 import datapath.datapath;
+import datapath.instructions;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -27,6 +29,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
@@ -56,7 +59,7 @@ public class SimulatorController implements Initializable {
     boolean disable_writing_to_pipelined_regs = false;
     boolean watch_pipline_reg = false;
     boolean stall_decode = false;
-    int current_index=0;
+    int current_index = 0;
     @FXML
     private TableView registersTable;
     @FXML
@@ -109,6 +112,20 @@ public class SimulatorController implements Initializable {
         machineCodeTable.setItems(Mlist);
         registersTable.setItems(Rlist);
         memoryTab.setItems(this.memlist);
+//        machineCodeTable.setRowFactory(tv -> new TableRow<MTable>() {
+//            @Override
+//            public void updateItem(MTable item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if (item == null) {
+//                    setStyle("");
+//                } else if (item.getPc().equals(String.format("0x%08X", 0))) {
+//                    setStyle("-fx-background-color: tomato;");
+//                } else {
+//                    setStyle("");
+//                }
+//            }
+//        });
+
     }
 
     /**
@@ -164,18 +181,18 @@ public class SimulatorController implements Initializable {
     public ObservableList<memtab> getMemTableList(int index) {
         int id = index >> 2;
         id = id << 2;
-        id = id +28;//plus or minus seven addresses in a table;
+        id = id + 28;//plus or minus seven addresses in a table;
         memlist.removeAll();
         for (int i = 0; i < 20; i++) {
             if (id >= 0 && id < 0x7FFFFFF0) {
                 String s1 = String.format("0x%08X", id);
-                String s2 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 0, "0"),2)));
-                String s3 =Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 1, "0"),2)));
-                String s4 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 2, "0"),2)));
-                String s5 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 3, "0"),2)));;
-                memlist.add(new memtab(s1,s2,s3,s4,s5));
+                String s2 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 0, "0"), 2)));
+                String s3 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 1, "0"), 2)));
+                String s4 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 2, "0"), 2)));
+                String s5 = Integer.toString((Integer.parseInt(memory.mem.getOrDefault(id + 3, "0"), 2)));;
+                memlist.add(new memtab(s1, s2, s3, s4, s5));
             } else {
-                memlist.add(new memtab("","","","",""));
+                memlist.add(new memtab("", "", "", "", ""));
             }
             id = id - 4;
         }
@@ -209,14 +226,42 @@ public class SimulatorController implements Initializable {
             System.out.println(e);
         }
         datapath dat = new datapath();
+//
+        dat.cur_pc = 0;
+        memory.pc = 0;
+        boolean flag;
+        instructions[] instr_que = new instructions[5];
+        for (instructions i : instr_que) {
+            i = null;
+        }
+        dat.pipelined = pipelined;
+        dat.data_forwarding = data_forwarding;
+        dat.disable_writing_to_registers = disable_writing_to_registers;
+        dat.disable_writing_to_pipelined_regs = disable_writing_to_pipelined_regs;
+        dat.watch_pipline_reg = watch_pipline_reg;
+        dat.stall_decode = stall_decode;
+        //int n=30;
+        while (true) {
+            //n--;
 
-        dat.run(memory, pipelined,
-                data_forwarding,
-                disable_writing_to_registers,
-                disable_writing_to_pipelined_regs,
-                watch_pipline_reg,
-                stall_decode
-        );
+            dat.print_reg(memory);
+            dat.prev_pc = dat.cur_pc;
+            flag = dat.fetch(memory, instr_que);
+            dat.write(memory, instr_que);
+            dat.print_reg(memory);
+            dat.decode(memory, instr_que);
+            dat.execute(memory, instr_que);
+            dat.no_of_cycles++;
+           this.a(dat.cur_pc);
+            //print_que(instr_que);
+            if (dat.memory(memory, instr_que) && !flag) {
+                break;
+            }
+
+        }
+        dat.calculate_data();
+        dat.print_summary();
+//
         registersTable.getItems().clear();
         registersTable.setItems(getRTableList());
         this.memoryTab.getItems().clear();
@@ -290,5 +335,21 @@ public class SimulatorController implements Initializable {
         }
 
     }
-
+    public void a(int a)
+    {
+         machineCodeTable.setRowFactory(tv -> new TableRow<MTable>() {
+                @Override
+                public void updateItem(MTable item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null) {
+                        setStyle("");
+                    } else if (item.getPc().equals(String.format("0x%08X", 0))) {
+                        setStyle("-fx-background-color: tomato;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            });
+    }
+   
 }
