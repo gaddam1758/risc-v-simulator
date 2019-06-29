@@ -1,0 +1,7 @@
+.keyword {
+    -fx-fill: #0066cc;
+    -fx-font-weight: bold;
+}
+.comment {
+	-fx-fill: #000033;
+}

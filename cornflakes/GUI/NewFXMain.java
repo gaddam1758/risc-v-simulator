@@ -16,9 +16,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Collections;
+import java.time.Duration;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -33,14 +36,17 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.reactfx.Subscription;
 
 /**
  *
@@ -54,6 +60,39 @@ public class NewFXMain extends Application {
     String outputfile;
     String dir;
     String file;
+    
+    private static final String[] KEYWORDS = new String[] {
+            "sll", "add", "sub", "slt", "sltu", "la",
+            "xor", "srl", "sra", "or", "and", "li" ,
+            "addw", "subw", "sllw", "srlw", "sraw",
+            "lb", "lh", "mul", "div", "rem", "data" ,
+            "lw", "lbu", "lhu", "lwu", "addi",
+            "slli", "slti", "sltiu", "xori", "srli",
+            "srai", "ori", "andi", "addiw", "slliw",
+            "srliw", "sraiw", "jalr", "sb", "sh",
+            "sw", "auipc", "lui", "jal", "beq", "byte",
+            "bne", "blt", "bge", "bltu", "bgeu","exit","text" , "word"
+    };
+
+    private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
+    //private static final String PAREN_PATTERN = "\\(|\\)";
+    //private static final String BRACE_PATTERN = "\\{|\\}";
+    //private static final String BRACKET_PATTERN = "\\[|\\]";
+    //private static final String SEMICOLON_PATTERN = "\\;";
+    //private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
+    private static final String COMMENT_PATTERN = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/";
+    
+     private static final Pattern PATTERN = Pattern.compile(
+            "(?<KEYWORD>" + KEYWORD_PATTERN + ")"
+            //+ "|(?<PAREN>" + PAREN_PATTERN + ")"
+            //+ "|(?<BRACE>" + BRACE_PATTERN + ")"
+            //+ "|(?<BRACKET>" + BRACKET_PATTERN + ")"
+           // + "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")"
+           // + "|(?<STRING>" + STRING_PATTERN + ")"
+            + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
+    );
+
+    
     public primary_memory memory = new primary_memory();
     boolean pipelined = false;
     boolean data_forwarding = false;
@@ -67,7 +106,7 @@ public class NewFXMain extends Application {
     boolean b4 = false;
     int current_address = 0x00000000;
     StyleClassedTextArea codeArea = new StyleClassedTextArea();
-    Scene editor_scene;
+    Scene editor_scene,editor_scene1;
     Scene simulator_scene;
     MenuBar menu = new MenuBar();
     Menu File = new Menu("File");
@@ -78,7 +117,8 @@ public class NewFXMain extends Application {
 
     ToolBar toolbar = new ToolBar();
     Button simulator = new Button("Simulator");
-    Button under = new Button("underline");
+ //   Button under = new Button("underline");
+    Button highli = new Button("highlight");
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -89,16 +129,18 @@ public class NewFXMain extends Application {
         File.getItems().addAll(New, Open, Save, SaveAs);
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
         menu.getMenus().add(File);
-        toolbar.getItems().addAll(simulator,under);
+        toolbar.getItems().addAll(simulator,highli);
         VBox root = new VBox();
         VirtualizedScrollPane pane = new VirtualizedScrollPane<>(codeArea);
         VBox.setVgrow(pane, Priority.ALWAYS);
         root.getChildren().addAll(menu, toolbar, pane);
         //simulator_scene = new Scene(), 1000, 500);
         editor_scene=new Scene(root,1000,500);
-        editor_scene.getStylesheets().add(getClass().getResource("/CSS/spellchecking.css").toExternalForm());
+        editor_scene.getStylesheets().add(getClass().getResource("/CSS/java-keywords.css").toExternalForm());
+       // editor_scene.getStylesheets().add(getClass().getResource("/CSS/spellchecking.css").toExternalForm());
         primaryStage.setScene(editor_scene);
         primaryStage.show();
+        
         //all button functions start
         simulator.setOnAction(e
                 -> {
@@ -159,7 +201,7 @@ public class NewFXMain extends Application {
             
         });
         
-        under.setOnAction( e->{
+      /*  under.setOnAction( e->{
     		under.getStyleClass().add("pressed");
     		//updateStyleInSelection(spans -> TextStyle.underline(!spans.styleStream().allMatch(style -> style.underline.orElse(false))));
     		System.out.println("underline");
@@ -183,7 +225,31 @@ public class NewFXMain extends Application {
 							e1.printStackTrace();
 						}
     		
-    	});
+    	});*/
+        
+        highli.setOnAction(e->{
+        highli.getStyleClass().add("pressed");
+                String content1="you haven't typed anything";
+               File file1 = new File("new1.txt");
+    		try {
+                FileWriter filewriter1 = new FileWriter(file1);
+                content1 = codeArea.getText();
+                //content1 = content1.replaceAll("(?!\\r)\\n", "\r\n");
+                filewriter1.write(content1);
+                // setTitle(filename);
+                filewriter1.flush();
+                filewriter1.close();
+            } catch (IOException c) {
+                System.out.println("File not found");
+            }
+    		
+                        try {
+					codeArea.setStyleSpans(0, computeHighlighting1(content1));
+						} catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+        });
         //all button function end
     }
 
@@ -321,6 +387,28 @@ private static StyleSpans<Collection<String>> computeHighlighting() throws IOExc
         
         spansBuilder.add(Collections.emptyList(), lastIndex - lastKwEnd);
 
+        return spansBuilder.create();
+    }
+ private static StyleSpans<Collection<String>> computeHighlighting1(String text) {
+        Matcher matcher = PATTERN.matcher(text);
+        int lastKwEnd = 0;
+        StyleSpansBuilder<Collection<String>> spansBuilder
+                = new StyleSpansBuilder<>();
+        while(matcher.find()) {
+            String styleClass =
+                    matcher.group("KEYWORD") != null ? "keyword" :
+                    //matcher.group("PAREN") != null ? "paren" :
+                    //matcher.group("BRACE") != null ? "brace" :
+                    //matcher.group("BRACKET") != null ? "bracket" :
+                    //matcher.group("SEMICOLON") != null ? "semicolon" :
+                    //matcher.group("STRING") != null ? "string" :
+                    matcher.group("COMMENT") != null ? "comment" :
+                    null; /* never happens */ assert styleClass != null;
+            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+            lastKwEnd = matcher.end();
+        }
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
         return spansBuilder.create();
     }
 
