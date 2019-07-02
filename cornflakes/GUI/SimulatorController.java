@@ -55,6 +55,7 @@ public class SimulatorController implements Initializable {
     ObservableList<RTable> Rlist = FXCollections.observableArrayList();
     ObservableList<memtab> memlist = FXCollections.observableArrayList();
     ArrayList<String> assemblyCode;
+    ArrayList<String> OriginalCode;
     Object[][] reg;
     boolean pipelined = false;
     boolean data_forwarding = false;
@@ -82,6 +83,8 @@ public class SimulatorController implements Initializable {
     @FXML
     private TableColumn<MTable, String> ACColumn;
     @FXML
+    private TableColumn<MTable,String> OCColumn;
+    @FXML
     private Button run;
     @FXML
     private Button editor;
@@ -98,7 +101,7 @@ public class SimulatorController implements Initializable {
     @FXML
     TableColumn<memtab, String> c5;
     @FXML
-    private ComboBox<?> memComboBox;
+    private ComboBox<?> memChoiceBox;
     @FXML
     private Button step;
     @FXML
@@ -121,6 +124,7 @@ public class SimulatorController implements Initializable {
         PCColumn.setCellValueFactory(new PropertyValueFactory<MTable, String>("Pc"));
         MCColumn.setCellValueFactory(new PropertyValueFactory<MTable, String>("MachineCode"));
         ACColumn.setCellValueFactory(new PropertyValueFactory<MTable, String>("AssemblyCode"));
+        OCColumn.setCellValueFactory(new PropertyValueFactory<MTable,String>("OriginalCode"));
         RegistersColumn.setCellValueFactory(new PropertyValueFactory<RTable, String>("register"));
         RegisterValueColumn.setCellValueFactory(new PropertyValueFactory<RTable, String>("value"));
         c1.setCellValueFactory(new PropertyValueFactory<memtab, String>("address"));
@@ -150,10 +154,11 @@ public class SimulatorController implements Initializable {
     /**
      * this method will get information from main scene
      */
-    void transfeBetweenScenes(String filename, ArrayList<String> assemblyCode, primary_memory memory, Scene scene, Stage window) throws IOException {
+    void transfeBetweenScenes(String filename, ArrayList<String> assemblyCode,ArrayList<String> OriginalCode, primary_memory memory, Scene scene, Stage window) throws IOException {
         this.filename = filename;
         this.memory = memory;
         this.assemblyCode = assemblyCode;
+        this.OriginalCode=OriginalCode;
         this.original_scene = scene;
         this.window = window;
         getMTableList();
@@ -175,11 +180,11 @@ public class SimulatorController implements Initializable {
         String line = null;
         while ((line = reader.readLine()) != null) {
             String temp = String.format("0x%08X", pc);
-            Mlist.add(new MTable(temp, line, assemblyCode.get(pc / 4)));
+            Mlist.add(new MTable(temp, line, assemblyCode.get(pc / 4),OriginalCode.get(pc/4)));
             pc = pc + 4;
         }
         if (Mlist.isEmpty()) {
-            Mlist.add(new MTable("", "", ""));
+            Mlist.add(new MTable("", "", ""," "));
         }
         return Mlist;
     }
@@ -261,6 +266,7 @@ public class SimulatorController implements Initializable {
         }
         memStack.push((primary_memory) deepCopy(memory));
         datStack.push((datapath) deepCopy(dat));
+        this.highlightingRow(dat.cur_pc);
         boolean flag;
         for (int i = 0; i < 5; i++) {
             dat.print_reg(memory);
@@ -271,7 +277,6 @@ public class SimulatorController implements Initializable {
             dat.decode(memory, instr_que);
             dat.execute(memory, instr_que);
             dat.no_of_cycles++;
-            this.highlightingRow(dat.cur_pc);
             dat.print_que(instr_que);
             dat.memory(memory, instr_que);
         }
@@ -448,7 +453,7 @@ public class SimulatorController implements Initializable {
                 super.updateItem(item, empty);
                 if (item == null) {
                     setStyle("");
-                } else if (item.getPc().equals(String.format("0x%08X", 0))) {
+                } else if (item.getPc().equals(String.format("0x%08X", row))) {
                     setStyle("-fx-background-color: tomato;");
                 } else {
                     setStyle("");

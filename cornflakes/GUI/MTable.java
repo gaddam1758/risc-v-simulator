@@ -12,41 +12,48 @@ import javafx.beans.property.SimpleStringProperty;
  *
  * @author ramak
  */
-public  class MTable
-    {
-        SimpleStringProperty Pc;
-        SimpleStringProperty MachineCode;
-        SimpleStringProperty AssemblyCode;
+public class MTable {
+	SimpleStringProperty Pc;
+	SimpleStringProperty MachineCode;
+	SimpleStringProperty AssemblyCode;
+	SimpleStringProperty OriginalCode;
 
-    public MTable(String Pc, String MachineCode, String AssemblyCode) {
-        this.Pc = new SimpleStringProperty(Pc);
-        this.MachineCode = new SimpleStringProperty(MachineCode);
-        this.AssemblyCode = new SimpleStringProperty(AssemblyCode);
-    }
+	public MTable(String Pc, String MachineCode, String AssemblyCode, String OriginalCode) {
+		this.Pc = new SimpleStringProperty(Pc);
+		this.MachineCode = new SimpleStringProperty(MachineCode);
+		this.AssemblyCode = new SimpleStringProperty(AssemblyCode);
+		this.OriginalCode = new SimpleStringProperty(OriginalCode);
+	}
 
-    public String getPc() {
-        return Pc.get();
-    }
+	public String getPc() {
+		return Pc.get();
+	}
 
-    public void setPc(SimpleStringProperty Pc) {
-        this.Pc = Pc;
-    }
+	public void setPc(SimpleStringProperty Pc) {
+		this.Pc = Pc;
+	}
 
-    public String getMachineCode() {
-        return MachineCode.get();
-    }
+	public String getMachineCode() {
+		return MachineCode.get();
+	}
 
-    public void setMachineCode(SimpleStringProperty MachineCode) {
-        this.MachineCode = MachineCode;
-    }
+	public void setMachineCode(SimpleStringProperty MachineCode) {
+		this.MachineCode = MachineCode;
+	}
 
-    public String getAssemblyCode() {
-        return AssemblyCode.get();
-    }
+	public String getAssemblyCode() {
+		return AssemblyCode.get();
+	}
 
-    public void setAssemblyCode(SimpleStringProperty AssemblyCode) {
-        this.AssemblyCode = AssemblyCode;
-    }
-    
-        
-    }
+	public void setAssemblyCode(SimpleStringProperty AssemblyCode) {
+		this.AssemblyCode = AssemblyCode;
+	}
+
+	public String getOriginalCode() {
+		return OriginalCode.get();
+	}
+
+	public void setOriginalCode(SimpleStringProperty originalCode) {
+		OriginalCode = originalCode;
+	}
+}
